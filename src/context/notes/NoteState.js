@@ -1,48 +1,100 @@
-import {React, useState} from "react";
+import { React, useState } from "react";
 import NoteContext from "./noteContext";
 
 const NoteState = (props) => {
-  const notesInitial =[
-    {
-      "_id": "61edb480a2341c1a4997d494",
-      "user": "61edb367a2341c1a4997d48a",
-      "title": "My title 1",
-      "description": "Please wake up early and brush",
-      "tag": "very personal",
-      "date": "2022-01-23T20:03:12.085Z",
-      "__v": 0
-    },
-    {
-      "_id": "61f2b7671ed090ad843c90eb",
-      "user": "61edb367a2341c1a4997d48a",
-      "title": "My title 2",
-      "description": "Please wake up early and brush and shushu",
-      "tag": "very personal hai",
-      "date": "2022-01-27T15:16:55.641Z",
-      "__v": 0
-    },
-    {
-      "_id": "61f2b77a1ed090ad843c90ed",
-      "user": "61edb367a2341c1a4997d48a",
-      "title": "My title 3",
-      "description": "Please wake up early and brush and shushu and breakfast",
-      "tag": "very personal hai bhai",
-      "date": "2022-01-27T15:17:14.172Z",
-      "__v": 0
-    },
-    {
-      "_id": "61f2b78e1ed090ad843c90ef",
-      "user": "61edb367a2341c1a4997d48a",
-      "title": "My title 4",
-      "description": "Please wake up early and brush and shushu and breakfast then go to school",
-      "tag": "very personal hai bhai smjho",
-      "date": "2022-01-27T15:17:34.149Z",
-      "__v": 0
+  const host = "http://localhost:5000";
+  const notesInitial = [];
+  const [notes, setNotes] = useState(notesInitial);
+
+  // Get all notes
+  const getNotes = async () => {
+    // api
+    const response = await fetch(`${host}/api/notes/fetchallnotes`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "auth-token":
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjFlZGIzNjdhMjM0MWMxYTQ5OTdkNDhhIn0sImlhdCI6MTY0Mjk2Nzk4OX0.lLRRNsEvmjkptENHWFE-O0w1iCPiB8qDGfT6tX_tn4Y",
+      },
+    });
+    const json = await response.json();
+    console.log(json);
+    setNotes(json);
+  };
+
+  // Add a note
+  const addNote = async (title, description, tag) => {
+    // api
+    const response = await fetch(`${host}/api/notes/addnote`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "auth-token":
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjFlZGIzNjdhMjM0MWMxYTQ5OTdkNDhhIn0sImlhdCI6MTY0Mjk2Nzk4OX0.lLRRNsEvmjkptENHWFE-O0w1iCPiB8qDGfT6tX_tn4Y",
+      },
+      body: JSON.stringify({ title, description, tag }),
+    });
+
+    const note = await response.json();
+    setNotes(notes.concat(note));
+  };
+
+  // Delete a note
+  const deleteNote = async (id) => {
+    // api
+    const response = await fetch(`${host}/api/notes/deletenote/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "auth-token":
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjFlZGIzNjdhMjM0MWMxYTQ5OTdkNDhhIn0sImlhdCI6MTY0Mjk2Nzk4OX0.lLRRNsEvmjkptENHWFE-O0w1iCPiB8qDGfT6tX_tn4Y",
+      },
+    });
+    const json = response.json();
+    console.log(json);
+    console.log("deleting note with id  " + id);
+    const newNotes = notes.filter((note) => {
+      return note._id !== id;
+    });
+
+    setNotes(newNotes);
+  };
+
+  // Edit a note
+  const editNote = async (id, title, description, tag) => {
+    // api calls
+    const response = await fetch(`${host}/api/notes/updatenote/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "auth-token":
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjFlZGIzNjdhMjM0MWMxYTQ5OTdkNDhhIn0sImlhdCI6MTY0Mjk2Nzk4OX0.lLRRNsEvmjkptENHWFE-O0w1iCPiB8qDGfT6tX_tn4Y",
+      },
+      body: JSON.stringify({ title, description, tag }),
+    });
+    const json = await response.json();
+    console.log(json);
+
+    const newNotes = JSON.parse(JSON.stringify(notes));
+    for (let index = 0; index < newNotes.length; index++) {
+      const element = newNotes[index];
+      if (element._id === id) {
+        newNotes[index].title = title;
+        newNotes[index].description = description;
+        newNotes[index].tag = tag;
+        break;
+      }
     }
-  ]
-  const [notes, setnotes] = useState(notesInitial);
-    
-    return <NoteContext.Provider value ={{notes}}> {props.children}</NoteContext.Provider>;
+    setNotes(newNotes);
+  };
+
+  return (
+    <NoteContext.Provider
+      value={{ notes, addNote, deleteNote, editNote, getNotes }}
+    >
+      {props.children}
+    </NoteContext.Provider>
+  );
 };
 
 export default NoteState;

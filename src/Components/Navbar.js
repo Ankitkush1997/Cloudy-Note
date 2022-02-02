@@ -1,12 +1,8 @@
 import React from "react";
-import { Link,  useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export const Navbar = () => {
   let location = useLocation();
-  React.useEffect(() => {
-    console.log(location.pathname)
-  }, [location]);
-
   return (
     <div className="App">
       <div>
@@ -32,28 +28,33 @@ export const Navbar = () => {
             >
               <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                 <li className="nav-item">
-                  <Link className={`nav-link ${location.pathname==="/home" ? "active" : ''}`} aria-current="page" to="/home">
+                  <Link
+                    className={`nav-link ${
+                      location.pathname === "/home" ? "active" : ""
+                    }`}
+                    aria-current="page"
+                    to="/home"
+                  >
                     Home
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link className={`nav-link ${location.pathname==="/about" ? "active" : ''}`} to="/about">
+                  <Link
+                    className={`nav-link ${
+                      location.pathname === "/about" ? "active" : ""
+                    }`}
+                    to="/about"
+                  >
                     About
                   </Link>
                 </li>
-               
               </ul>
-              <form className="d-flex">
-                <input
-                  className="form-control me-2"
-                  type="search"
-                  placeholder="Search"
-                  aria-label="Search"
-                />
-                <button className="btn btn-outline-success" type="submit">
-                  Search
-                </button>
-              </form>
+              <Link className="btn btn-primary mx-2" to="/login" role="button">
+                Login
+              </Link>
+              <Link className="btn btn-primary mx-2" to="/signup" role="button">
+                SignUp
+              </Link>
             </div>
           </div>
         </nav>
